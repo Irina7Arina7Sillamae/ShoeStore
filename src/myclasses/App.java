@@ -79,7 +79,7 @@ public class App {
                     break;
                 case 5:
                     System.out.println("---------------");
-                    System.out.println("*** Покупка покупателем обуви ***");
+                    System.out.println("*** Продажа обуви ***");
                     History history = addHistory();
                     histories.add(history);
                     keeping.saveHistories(histories);
@@ -95,43 +95,44 @@ public class App {
                     break;
                 case 6:
                     System.out.println("-------------------");
-                    System.out.println("*** Список проданной обуви ***");  
-                    System.out.println("-------------------");
+                    System.out.println("*** Список проданной обуви ***");
+                    System.out.println("**** Товар продан: ***"); 
                     int n = 0;
                     for (int i = 0; i < histories.size(); i++) {
                         if(histories.get(i) != null
-                            && histories.get(i).getModel().getCount() 
-                            <  histories.get(i).getModel().getQuantity()
-                         ){
-                    System.out.printf("%d. * Книгу \"%s\" читает %s %s%n"
-                        ,i+1
-                        ,histories.get(i).getModel().getManufacturer()
-                        ,histories.get(i).getModel().getColor()
-                        ,histories.get(i).getModel().getPrice()
-                        ,histories.get(i).getModel().getSize()
-                        ,histories.get(i).getBuyer().getName()
-                        ,histories.get(i).getBuyer().getPhone()
-                    );
-                    n++;
+                            /*&& histories.get(i).getModel().getCount() 
+                            <  histories.get(i).getModel().getQuantity()*/) {                          
+                            System.out.println( i+1 + ". " 
+                                    + histories.get(i).getModel().getManufacturer()
+                                    + histories.get(i).getModel().getColor()
+                                    + histories.get(i).getModel().getPrice() + "eur "
+                                    + histories.get(i).getModel().getSize()
+                                    + histories.get(i).getBuyer().getName()
+                                    + histories.get(i).getBuyer().getPhone()
+                            );
+                        n++;
                         }
                     }
-                
-            if(n < 1){
+                    System.out.println("-------------------");
+            if (n < 1){
                 System.out.println("*** Товара нет! ***");
                 System.out.println("-------------------");
+                break;
             }
-                return;
+                
                    /* case 7:
                     System.out.println("*** Доход магазина за все время работы ***");
                     
                 case 8:
                     System.out.println("*** Добавить денег покупателю ***");
                      */
+                  break;
                 default:
-                    System.out.println("*** Выберите цифру из списка! ***");;
+                    System.out.println("*** Выберите цифру из списка! ***");
             }
         }while("r".equals(repeat));
     }
+    
     private Model addModel(){
         Model model = new Model();
         System.out.print("Введите производителя: ");
@@ -194,6 +195,7 @@ public class App {
         history.setBuyer(buyers.get(numberBuyer-1));
         Calendar c = new GregorianCalendar();
         history.setDateOfSale(c.getTime());
+        history.getModel().setCount(history.getModel().getCount() - 1);
         
         return history;             
     }
