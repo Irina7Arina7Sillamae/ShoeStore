@@ -4,6 +4,7 @@ package myclasses;
 import entity.Buyer;
 import entity.History;
 import entity.Model;
+import interfases.Keeping;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +18,13 @@ public class App {
     private List<Model> models = new ArrayList<>();
     private List<Buyer> buyers = new ArrayList<>();
     private List<History> histories = new ArrayList<>();
+    private Keeping keeping = (Keeping) new KeeperToFile();
+    
+    public App() {
+        models = keeping.loadModels();
+        buyers = keeping.loadBuyers();
+        histories = keeping.loadHistories();
+    }
 
     public void run() {
         String repeat = "r";
@@ -41,11 +49,13 @@ public class App {
                 case 1:
                     System.out.println("*** Добавление модели ***");
                     models.add(addModel());
+                    keeping.saveModels(models);
                     break;
                 case 2:
+                    System.out.println("-------------------");
                     System.out.println("*** Список полученных моделей ***");
                     for (int i = 0; i < models.size(); i++) {
-                        if(models.get(i) != null){
+                        if(models.get(i) != null && models.get(i).getCount() > 0){
                             System.out.println(models.get(i).toString());
                         }
                         
@@ -55,8 +65,10 @@ public class App {
                 case 3:
                     System.out.println("*** Добавление покупателя ***");
                     buyers.add(addBuyer());
+                    keeping.saveBuyers(buyers);
                     break;
                 case 4:
+                    System.out.println("---------------");
                     System.out.println("*** Список покупателей ***");
                     for (int i = 0; i < buyers.size(); i++) {
                         if(buyers.get(i) != null){
@@ -66,23 +78,50 @@ public class App {
                     System.out.println("---------------");
                     break;
                 case 5:
+                    System.out.println("---------------");
                     System.out.println("*** Покупка покупателем обуви ***");
                     History history = addHistory();
                     histories.add(history);
+                    keeping.saveHistories(histories);
                     System.out.println("-------------------");
-                    System.out.println("Model "+history.getModel().getManufacturer()
+                    System.out.println("*** Товар *** производитель:  "+history.getModel().getManufacturer()
                                         + " / цвет: " + history.getModel().getColor()
                                         + " / размер: " + history.getModel().getSize()
-                                        + " / цена: " + history.getModel().getPrice()
-                                        + " / куплена покупателем "+history.getBuyer().getName()
+                                        + " / цена: " + history.getModel().getPrice() + "eur"
+                                        + " / продан покупателю "+history.getBuyer().getName()
                                         + " / тел: " +history.getBuyer().getPhone()
                     );
                     System.out.println("-------------------");
                     break;
-               /* case 6:
-                    System.out.println("*** Список проданной обуви ***");
-                    
-                    case 7:
+                case 6:
+                    System.out.println("-------------------");
+                    System.out.println("*** Список проданной обуви ***");  
+                    System.out.println("-------------------");
+                    int n = 0;
+                    for (int i = 0; i < histories.size(); i++) {
+                        if(histories.get(i) != null
+                            && histories.get(i).getModel().getCount() 
+                            <  histories.get(i).getModel().getQuantity()
+                         ){
+                    System.out.printf("%d. * Книгу \"%s\" читает %s %s%n"
+                        ,i+1
+                        ,histories.get(i).getModel().getManufacturer()
+                        ,histories.get(i).getModel().getColor()
+                        ,histories.get(i).getModel().getPrice()
+                        ,histories.get(i).getModel().getSize()
+                        ,histories.get(i).getBuyer().getName()
+                        ,histories.get(i).getBuyer().getPhone()
+                    );
+                    n++;
+                        }
+                    }
+                
+            if(n < 1){
+                System.out.println("*** Товара нет! ***");
+                System.out.println("-------------------");
+            }
+                return;
+                   /* case 7:
                     System.out.println("*** Доход магазина за все время работы ***");
                     
                 case 8:
@@ -125,32 +164,36 @@ public class App {
 
         private History addHistory() {
         History history = new History();
-        System.out.println("* Список обуви: *");
+        System.out.println("*** Список обуви ***");
         for (int i = 0; i < models.size(); i++) {
             if(models.get(i) != null){
                 System.out.println(i+1
                         +". " + "производитель: " + models.get(i).getManufacturer()
-                        +". " + "цвет: " + models.get(i).getColor()
-                        +". " + "цена: " + models.get(i).getPrice()
-                        +". " + "размер: " + models.get(i).getSize()
+                        +" / " + "цвет: " + models.get(i).getColor()
+                        +" / " + "цена: " + models.get(i).getPrice() + "eur"
+                        +" / " + "размер: " + models.get(i).getSize()
+                        +" / " + "в наличии: " + models.get(i).getCount() + "шт"
                         
                 );
             }
         }
-        System.out.print("*** Выберите номер модели: ***");
+        System.out.println("---------------");
+        System.out.print("*** Выберите номер модели: ***   ");
         int numberModel = scanner.nextInt(); scanner.nextLine();
-        System.out.println("*** Список покупателей: ***");
+        System.out.println("---------------");
+        System.out.println("*** Список покупателей ***");
         for (int i = 0; i < buyers.size(); i++) {
             if(buyers.get(i) != null){
                 System.out.println(i+1+". "+buyers.get(i).toString());
             }
         }
-        System.out.print("*** Выберите номер покупателя: ***");
+        System.out.println("---------------");
+        System.out.print("*** Выберите номер покупателя: ***   ");
         int numberBuyer = scanner.nextInt(); scanner.nextLine();
         history.setModel(models.get(numberModel-1));
         history.setBuyer(buyers.get(numberBuyer-1));
         Calendar c = new GregorianCalendar();
-        history.setPurchaseDate(c.getTime());
+        history.setDateOfSale(c.getTime());
         
         return history;             
     }

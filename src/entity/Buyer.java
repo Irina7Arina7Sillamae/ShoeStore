@@ -1,8 +1,10 @@
 
 package entity;
 
+import java.io.Serializable;
 
-public class Buyer {
+
+public class Buyer implements Serializable {
     private String name;
     private String phone;
     private int purse;
@@ -36,7 +38,7 @@ public class Buyer {
 
     @Override
     public String toString() {
-        return "* Buyer * " + "  имя: " + name + " / тел: " + phone + " / деньги: " + purse + "eur" ;
+        return "* Покупатель * " + " имя: " + name + " / тел: " + phone + " / деньги: " + purse + "eur" ;
     }
     
     

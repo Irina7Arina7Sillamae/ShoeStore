@@ -1,8 +1,10 @@
 
 package entity;
 
+import java.io.Serializable;
 
-public class Model {
+
+public class Model implements Serializable {
     private String manufacturer;
     private String color;
     private int size;
@@ -61,7 +63,7 @@ public class Model {
 
     @Override
     public String toString() {
-        return "*Model*  " + " производитель: " + manufacturer 
+        return "* Model * "  + " производитель: " + manufacturer 
                 + " / цвет: " + color 
                 + " / размер: " + size 
                 + " / цена: " + price + " eur" 

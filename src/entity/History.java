@@ -1,13 +1,14 @@
 
 package entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 
-public class History {
+public class History implements Serializable {
     private Buyer buyer;
     private Model model;
-    private Date purchaseDate;
+    private Date DateOfSale;
 
     public History() {
     }
@@ -28,18 +29,20 @@ public class History {
         this.model = model;
     }
 
-    public Date getPurchaseDate() {
-        return purchaseDate;
+    public Date getDateOfSale() {
+        return DateOfSale;
     }
 
-    public void setPurchaseDate(Date purchaseDate) {
-        this.purchaseDate = purchaseDate;
+    public void setDateOfSale(Date DateOfSale) {
+        this.DateOfSale = DateOfSale;
     }
 
     @Override
     public String toString() {
-        return "History{" + "buyer=" + buyer + ", model=" + model + ", purchaseDate=" + purchaseDate + '}';
+        return "History{" + "buyer=" + buyer + ", model=" + model + ", DateOfSale=" + DateOfSale + '}';
     }
+
+   
 
    
     
