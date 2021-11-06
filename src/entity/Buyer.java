@@ -7,8 +7,9 @@ import java.io.Serializable;
 public class Buyer implements Serializable {
     private String name;
     private String phone;
-    private int purse;
-
+    private int money;
+    private int addMoney;
+    
     public Buyer() {
     }
 
@@ -28,17 +29,27 @@ public class Buyer implements Serializable {
         this.phone = phone;
     }
 
-    public int getPurse() {
-        return purse;
+    public int getMoney() {
+        return money;
     }
 
-    public void setPurse(int purse) {
-        this.purse = purse;
+    public void setMoney(int money) {
+        this.money = money;
     }
 
     @Override
     public String toString() {
-        return "* Покупатель * " + " имя: " + name + " / тел: " + phone + " / деньги: " + purse + "eur" ;
+        return "* Покупатель *" + "   имя: " + name + " / тел: " + phone + " / деньги: " + money + " eur" ;
+    }
+
+    
+
+    public int getAddMoney() {
+        return addMoney;
+    }
+
+    public void setAddMoney(int addMoney) {
+        this.addMoney = addMoney;
     }
     
     
