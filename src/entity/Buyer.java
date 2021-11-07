@@ -8,7 +8,7 @@ public class Buyer implements Serializable {
     private String name;
     private String phone;
     private int money;
-    private int addMoney;
+    private int putMoney;
     
     public Buyer() {
     }
@@ -44,12 +44,12 @@ public class Buyer implements Serializable {
 
     
 
-    public int getAddMoney() {
-        return addMoney;
+    public int getPutMoney() {
+        return putMoney;
     }
 
-    public void setAddMoney(int addMoney) {
-        this.addMoney = addMoney;
+    public void setPutMoney(int putMoney) {
+        this.putMoney = putMoney;
     }
     
     

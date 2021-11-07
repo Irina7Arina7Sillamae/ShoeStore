@@ -1,5 +1,3 @@
-
-
 package myclasses;
 
 import entity.Buyer;
@@ -54,7 +52,7 @@ public class App {
                     addModel();
                     break;
                 case 2:
-                  printListModels();
+                    printListModels();
                     break;
                 case 3:
                     addBuyer();
@@ -91,8 +89,8 @@ public class App {
                 break;
                 
                 case 7:
-                     System.out.println("-------------------");
-                        System.out.println("*** Список доходов по датам продаж ***");                      
+                    System.out.println("-------------------");
+                    System.out.println("*** Список доходов по датам продаж ***");                      
                         for (int i = 0; i < histories.size(); i++) {
                             if(histories.get(i) != null && histories.get(i).getModel().getCount()> 0) {
                                 System.out.println( "*** сумма: " + histories.get(i).getModel().getPrice() + "eur *** " + histories.get(i).getDateOfSale()
@@ -118,13 +116,15 @@ public class App {
                             } 
                         } 
                         System.out.println("*** общая сумма продаж:   " + sum + "   eur");
-                        //System.out.println("  цена: " + histories.get(i).getModel().getPrice() + "eur ");
                     
                 if (n < 1){
                     System.out.println("*** Товар пока не продавался! ***");
                     break;
                 }
-                break;
+                    break;
+                case 9:
+                    addMoney();
+                    break;
                  
                 default:
                     System.out.println("*** Выберите цифру из списка! ***");
@@ -213,6 +213,9 @@ public class App {
                 + " / покупатель: "+history.getBuyer().getName()
                 + " / тел: " + history.getBuyer().getPhone()
         );
+        
+       
+     
     }
         private void printListModels() {
             System.out.println("-------------------");
@@ -232,4 +235,37 @@ public class App {
                     }
                 }
         }
-}
+        
+        private void addMoney(){
+            System.out.println("---------------");
+            System.out.println("*** Добавить денег покупателю ***");
+            History history = new History(); 
+            System.out.println("*** Список покупателей ***");
+                for (int i = 0; i < buyers.size(); i++) {
+                    if(buyers.get(i) != null){
+                        System.out.println((i+1) + ".   " + buyers.get(i).toString());
+            }
+        }
+           System.out.println("---------------");
+           System.out.print("*** Выберите номер покупателя:   ***   ");
+           int numBuyer = scanner.nextInt(); scanner.nextLine();
+           System.out.println("*** Укажите сумму, которую хотите добавить   ***");
+           int addMoney = scanner.nextInt();scanner.nextLine();
+           history.setBuyer(buyers.get(numBuyer-1));
+           history.getBuyer().setMoney(history.getBuyer().getMoney() + addMoney);
+           histories.add(history);
+           keeping.saveBuyers(buyers);
+           keeping.saveHistories(histories);
+            System.out.println("--------------------");
+            System.out.println( " Покупателю: " + buyers.get(numBuyer-1).getName()
+                        + " / Добавлены денеги в сумме: " + addMoney + " eur"
+                        + " / Всего у покупателя: " +  buyers.get(numBuyer-1).getMoney() + " eur");                
+            }              
+        }
+       
+        
+        
+       
+        
+       
+        
