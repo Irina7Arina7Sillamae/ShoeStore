@@ -215,7 +215,9 @@ public class App {
         Calendar c = new GregorianCalendar();
         history.setDateOfSale(c.getTime());
         history.getModel().setCount(history.getModel().getCount() - 1);
+        history.getBuyer().setMoney(history.getBuyer().getMoney() - history.getModel().getPrice());
         keeping.saveModels(models);
+        keeping.saveBuyers(buyers);
         histories.add(history);
         keeping.saveHistories(histories);
         System.out.println("-------------------");
