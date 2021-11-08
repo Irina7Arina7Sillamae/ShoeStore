@@ -266,10 +266,10 @@ public class App {
                 for (int i = 0; i < histories.size(); i++) {
                     if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount()> 0) {
                         sum = sum + histories.get(i).getModel().getPrice(); 
-                        System.out.println("*** общая сумма продаж:   " + sum + "   eur"); 
                     n++;
                     } 
-                }   
+                } 
+                System.out.println("*** общая сумма продаж:   " + sum + "   eur"); 
                 if (n < 1){
                     System.out.println("*** Товар пока не продавался! ***");
                 }
