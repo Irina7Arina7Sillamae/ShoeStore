@@ -253,8 +253,7 @@ public class App {
                     }
             } 
             if (n < 1){
-            System.out.println("*** Товар пока не продавался! ***");
-                
+            System.out.println("*** Товар пока не продавался! ***");   
             }
         }
         
@@ -305,8 +304,10 @@ public class App {
            System.out.println("--------------------");
            System.out.println( " Покупателю: " + buyers.get(numBuyer-1).getName()
                         + " / Добавлены денеги в сумме: " + addMoney + " eur"
-                        + " / Всего у покупателя: " +  buyers.get(numBuyer-1).getMoney() + " eur");                
-            }  
+                        + " / Всего у покупателя: " +  buyers.get(numBuyer-1).getMoney() + " eur"); 
+            System.out.println("Вот!");
+            } 
+           
     
         }
        
