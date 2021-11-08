@@ -66,9 +66,9 @@ public class App {
                 case 6:
                     System.out.println("-------------------");
                     System.out.println("*** Список продаж ***");
-                   //int n = 0;
+                   
                     for (int i = 0; i < histories.size(); i++) {
-                        if(histories.get(i) != null
+                        if(histories.get(i).getModel() != null
                             && histories.get(i).getModel().getCount() > 0) {                          
                             System.out.println( i+1 + ". " 
                                     + "производитель: " + histories.get(i).getModel().getManufacturer()
@@ -92,7 +92,7 @@ public class App {
                     System.out.println("-------------------");
                     System.out.println("*** Список доходов по датам продаж ***");                      
                         for (int i = 0; i < histories.size(); i++) {
-                            if(histories.get(i) != null && histories.get(i).getModel().getCount()> 0) {
+                            if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount()> 0) {
                                 System.out.println( "*** сумма: " + histories.get(i).getModel().getPrice() + "eur *** " + histories.get(i).getDateOfSale()
                                 );
                             n++;
@@ -170,30 +170,43 @@ public class App {
         System.out.println("---------------");
         System.out.println("*** Продажа обуви ***");
         System.out.println("*** Список обуви ***");
-        History history = new History();       
+        History history = new History();
+        int n = 0;
         for (int i = 0; i < models.size(); i++) {
             if(models.get(i) != null && models.get(i).getCount() > 0){
-                System.out.println(i+1
+                System.out.println((i+1)
                         +". " + "производитель: " + models.get(i).getManufacturer()
                         +" / " + "цвет: " + models.get(i).getColor()
                         +" / " + "цена: " + models.get(i).getPrice() + "eur"
                         +" / " + "размер: " + models.get(i).getSize()
-                        +" / " + "в наличии: " + models.get(i).getCount() + "шт"
-                        
+                        +" / " + "в наличии: " + models.get(i).getCount() + "шт"     
                 );
+                 n++;
             }
-        }
+        } 
+         if (n < 1){
+            System.out.println("*** Нет обуви для продажи! ***");
+            return;
+            }
+        
         System.out.println("---------------");
         System.out.print("*** Выберите номер модели: ***   ");
         int numberModel = scanner.nextInt(); scanner.nextLine();
         System.out.println("---------------");
         System.out.println("*** Продажа обуви ***");
         System.out.println("*** Список покупателей ***");
+     
         for (int i = 0; i < buyers.size(); i++) {
             if(buyers.get(i) != null){
                 System.out.println(i+1+". "+buyers.get(i).toString());
+                 n++;
             }
-        }
+        } 
+         if (n < 1){
+            System.out.println("*** Покупателей нет! ***");
+            return;
+            }
+        
         System.out.println("---------------");
         System.out.print("*** Выберите номер покупателя: ***   ");
         int numberBuyer = scanner.nextInt(); scanner.nextLine();
@@ -220,20 +233,33 @@ public class App {
         private void printListModels() {
             System.out.println("-------------------");
             System.out.println("*** Список обуви в продаже ***");
-                 for (int i = 0; i < models.size(); i++) {
+            int n = 0;
+                for (int i = 0; i < models.size(); i++) {
                     if(models.get(i) != null && models.get(i).getCount() > 0){
                         System.out.println(models.get(i).toString());
-                        }      
+                         n++;
                     }
+                } 
+        if (n < 1){
+            System.out.println("*** Нет обуви для продажи! ***");
+           
+        }      
+                    
         }
         private void printListBuyers() {
             System.out.println("---------------");
             System.out.println("*** Список покупателей ***");
+            int n = 0;
                 for (int i = 0; i < buyers.size(); i++) {
                     if(buyers.get(i) != null){
                         System.out.println(buyers.get(i).toString());
+                        n++;
                     }
-                }
+                } 
+        if (n < 1){
+            System.out.println("*** Покупателей нет! ***");
+            
+        }
         }
         
         private void addMoney(){
@@ -241,11 +267,18 @@ public class App {
             System.out.println("*** Добавить денег покупателю ***");
             History history = new History(); 
             System.out.println("*** Список покупателей ***");
+            int n = 0;
                 for (int i = 0; i < buyers.size(); i++) {
                     if(buyers.get(i) != null){
                         System.out.println((i+1) + ".   " + buyers.get(i).toString());
+                         n++;
             }
-        }
+        } 
+         if (n < 1){
+            System.out.println("*** Покупателей нет! ***");
+            return;
+            }
+        
            System.out.println("---------------");
            System.out.print("*** Выберите номер покупателя:   ***   ");
            int numBuyer = scanner.nextInt(); scanner.nextLine();
