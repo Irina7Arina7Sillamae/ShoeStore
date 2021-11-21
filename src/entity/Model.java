@@ -2,17 +2,29 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 
+
+@Entity
 public class Model implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String manufacturer;
     private String color;
     private int size;
     private int price;
     private int quantity;
     private int count;
- 
-
+    
+    public Model() {
+        
+    }
+    
     public String getManufacturer() {
         return manufacturer;
     }
@@ -63,12 +75,20 @@ public class Model implements Serializable {
 
     @Override
     public String toString() {
-        return "* Model * "  + " производитель: " + manufacturer 
-                + " / цвет: " + color 
-                + " / размер: " + size 
-                + " / цена: " + price + " eur" 
-                + " / количество: " + quantity + "шт " 
-                + " /в наличии: " + count + "шт";
+        return "*** производитель: " + manufacturer 
+                + "/ цвет: " + color 
+                + "/ разм: " + size 
+                + "/ цена: " + price + " eur" 
+                + "/ кол-во: " + quantity + "шт " 
+                + "/ в наличии: " + count + "шт";
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
     
    

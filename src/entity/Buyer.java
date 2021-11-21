@@ -2,9 +2,17 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 
+@Entity
 public class Buyer implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private String phone;
     private int money;
@@ -39,7 +47,9 @@ public class Buyer implements Serializable {
 
     @Override
     public String toString() {
-        return "* Покупатель *" + "   имя: " + name + " / тел: " + phone + " / деньги: " + money + " eur" ;
+        return "* Покупатель *" + "   имя: " + name 
+                + " / тел: " + phone 
+                + " / деньги: " + money + " eur" ;
     }
 
     
@@ -51,6 +61,13 @@ public class Buyer implements Serializable {
     public void setPutMoney(int putMoney) {
         this.putMoney = putMoney;
     }
-    
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
     
 }

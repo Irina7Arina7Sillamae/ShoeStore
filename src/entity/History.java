@@ -3,11 +3,24 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
 
 
+@Entity
 public class History implements Serializable {
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long id;
+    @OneToOne
     private Buyer buyer;
+    @OneToOne
     private Model model;
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date DateOfSale;
 
     public History() {
@@ -39,12 +52,18 @@ public class History implements Serializable {
 
     @Override
     public String toString() {
-        return "History{" + "buyer=" + buyer + ", model=" + model + ", DateOfSale=" + DateOfSale + '}';
+        return "History{" + "buyer=" + buyer 
+                + ", model=" + model 
+                + ", DateOfSale=" + DateOfSale + '}';
     }
 
-   
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
    
-    
     
 }
