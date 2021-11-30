@@ -21,7 +21,7 @@ public class History implements Serializable {
     @OneToOne
     private Model model;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    private Date DateOfSale;
+    private Date dateOfSale;
 
     public History() {
     }
@@ -43,18 +43,18 @@ public class History implements Serializable {
     }
 
     public Date getDateOfSale() {
-        return DateOfSale;
+        return dateOfSale;
     }
 
     public void setDateOfSale(Date DateOfSale) {
-        this.DateOfSale = DateOfSale;
+        this.dateOfSale = DateOfSale;
     }
 
     @Override
     public String toString() {
         return "History{" + "buyer=" + buyer 
                 + ", model=" + model 
-                + ", DateOfSale=" + DateOfSale + '}';
+                + ", DateOfSale=" + dateOfSale + '}';
     }
 
     public Long getId() {
