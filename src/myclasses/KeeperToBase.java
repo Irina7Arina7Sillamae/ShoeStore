@@ -17,9 +17,9 @@ import javax.persistence.Persistence;
 
 
 public class KeeperToBase implements Keeping{
-       EntityManagerFactory emf = Persistence.createEntityManagerFactory("ShoeStorePU");
-       EntityManager em = emf.createEntityManager();
-       EntityTransaction tx = em.getTransaction();
+       private EntityManagerFactory emf = Persistence.createEntityManagerFactory("ShoeStorePU");
+       private EntityManager em = emf.createEntityManager();
+       private EntityTransaction tx = em.getTransaction();
 
     @Override
     public void saveModels(List<Model> models) {

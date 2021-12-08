@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.Arrays;
+import java.util.Date;
 
 public class App {
     private Scanner scanner = new Scanner(System.in);
@@ -33,6 +33,7 @@ public class App {
     public void run() {
         String repeat = "r";
         do{
+            System.out.println("");
             System.out.println("--------------------");
             System.out.println("*** Выберите номер задачи: ***");
             System.out.println("--------------------");
@@ -49,6 +50,7 @@ public class App {
             System.out.println("  10 : Редактировать товар" );
             System.out.println("  11 : Редактировать покупателя ");
             System.out.println("  12 : Список распроданной обуви");
+            System.out.println("  13 : Доход магазина за указанный месяц");
             int task = scanner.nextInt(); scanner.nextLine();
             int n = 0;
             switch (task) {
@@ -93,7 +95,10 @@ public class App {
                 case 12:
                     printListAllSold();
                     break;
-                 
+                case 13:
+                    incomeMonth();
+                    break;
+                    
                 default:
                     System.out.println("*** Выберите цифру из списка! ***");
             }
@@ -101,6 +106,9 @@ public class App {
     }
     
     private void addModel(){
+         if(isQuit()){
+            return;
+        }
         System.out.println("--------------------");
         System.out.println("*** Добавление модели обуви ***");
         Model model = new Model();
@@ -121,6 +129,9 @@ public class App {
    
     
     private void addBuyer(){
+         if(isQuit()){
+            return;
+        }
         System.out.println("-------------------");
         System.out.println("*** Добавление покупателя ***");
         Buyer buyer = new Buyer();
@@ -137,7 +148,7 @@ public class App {
         private void addHistory() {
             System.out.println("---------------");
             System.out.println("*** Продажа обуви ***");
-            System.out.println("*** Выберите обувь по номеру: ***");
+            System.out.println("*** Выберите номер обуви для покупки: ***");
             History history = new History();
             Set<Integer> setNumbersModels = printListModels();
             if(setNumbersModels.isEmpty()){
@@ -245,7 +256,7 @@ public class App {
             System.out.println("*** Список покупателей ***");
             Set<Integer> setNumbersBuyers = new HashSet<>();
                 for (int i = 0; i < buyers.size(); i++) {
-                    if(buyers.get(i) != null && buyers.get(i).getMoney() >= models.get(i).getPrice()){
+                    if(buyers.get(i) != null && buyers.get(i).getMoney() > (models.get(i).getPrice()-1)){
                          System.out.printf("%3d   %-22s  тел: %-12s %5d eur%n"
                         ,i+1
                         ,buyers.get(i).getName()
@@ -290,7 +301,8 @@ public class App {
             int n = 0;
             for (int i = 0; i < histories.size(); i++) {
                 if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount()> 0) {
-                    System.out.println( "*** сумма: " + histories.get(i).getModel().getPrice() + "eur *** " + histories.get(i).getDateOfSale()
+                    System.out.println( "*** сумма: " + histories.get(i).getModel().getPrice() + "eur *** " 
+                            + histories.get(i).getDateOfSale()
                     );
             n++;
                     }
@@ -352,14 +364,14 @@ public class App {
             } 
 
     private int getNumber() {
-        int number = 0;
+        int number;
         do{
             String strNumber = scanner.nextLine();
             try {
                 number = Integer.parseInt(strNumber);
                 return number;
             } catch (NumberFormatException e) {
-                System.out.println("Введено \""+ strNumber +"\". Выбирайте номер ");
+                System.out.println("Попробуй еще раз: ");
             }
         }while(true);
     }
@@ -371,9 +383,8 @@ public class App {
             if(setNumbers.contains(number)){
                 return number;
             }
-            System.out.println("*** Попробуй еще раз: ***");
+            System.out.println("Попробуй еще: ");
         }while(true);
-        
     }
 
     private void editProduct() {
@@ -435,7 +446,7 @@ public class App {
         }
         //пятое поле
         System.out.println("*** Количество: " + models.get(numberModel - 1).getQuantity());
-        System.out.println("*** Если нужно изменить количество, нажми 1, если пропустить, нажми 2");
+        System.out.printf("*** Если нужно изменить общее количество обуви,%n нажми 1, если пропустить, нажми 2");
         change = insertNumber(changeNumbers);
         if(1 == change){
             System.out.println("*** Введите новое количество обуви: ");
@@ -458,7 +469,7 @@ public class App {
      keeping.saveModels(models);   
     }
 
-    private void editBuyer() {
+    /*private void editBuyer() {
         System.out.println("---------------");
         System.out.println("*** Редактировать покупателя ***");
         if(isQuit()){
@@ -473,7 +484,8 @@ public class App {
         ***повторить для всех полей 
         *сохранить данные
         */
-         Set<Integer> changeNumbers = new HashSet<>();
+    
+     /*   Set<Integer> changeNumbers = new HashSet<>();
         changeNumbers.add(1);
         changeNumbers.add(2);
         Set<Integer> setNumbersBuyers = printListBuyers();
@@ -509,6 +521,62 @@ public class App {
         }
      keeping.saveBuyers(buyers);   
     }
+*/
+    
+    private void editBuyer() {
+        System.out.println("*** Выберите покупателя, которого хотитие изменить: ***");
+        int n=0;
+        for (int i = 0; i < buyers.size(); i++) {
+            if (buyers.get(i)!=null) {
+                System.out.printf("%d. %s. тел.: %s%n.  eur: %s%n."
+                ,i+1
+                ,buyers.get(i).getName()
+                ,buyers.get(i).getPhone()
+                ,buyers.get(i).getMoney()
+                );
+            }
+            n++;
+        }
+        if (n<1) {
+            System.out.println("*** Нет зарегистрированных покупателей");
+            return;
+        }
+        System.out.print("*** Выберите номер покупателя: ***");
+        int numberBuyer= getNumber();
+        String repeat="yes";
+        do{
+            System.out.println(" 0: Выход");
+            System.out.println(" 1: Изменить имя покупателя");
+            System.out.println(" 2: Изменить номер покупателя");
+            System.out.println("*** Выберите номер покупателя, данные которого хотите изменить: ");
+            int num=getNumber();
+            switch(num){
+                case 0:
+                    repeat="no";
+                    break;
+                case 1:
+                    System.out.print("Введите новое имя покупателя: ");
+                    
+                    buyers.get(numberBuyer - 1).setName(scanner.nextLine()); 
+                    keeping.saveBuyers(buyers);
+                    break;
+                case 2:
+                    System.out.print("Введите новый номер покупателя: ");
+                    String newPhone=scanner.nextLine();
+                    buyers.get(numberBuyer - 1).setPhone(newPhone);
+                    keeping.saveBuyers(buyers);
+                    break;
+                case 3:
+                    System.out.print("Введите другое количество денег: ");
+                    int newMoney=scanner.nextInt();
+                    buyers.get(numberBuyer - 1).setMoney(newMoney);
+                    keeping.saveBuyers(buyers);
+                    break;
+            }
+         }while("yes".equals(repeat));
+   
+    
+    }
 
     private boolean isQuit(){
         System.out.println("*** Чтобы закончить задачу нажми \"q\" ***");
@@ -519,10 +587,6 @@ public class App {
         }else{
             return false;
         }
-    }
-
-    private Set<Integer> printListAllBuyers() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
        private Set<Integer> printListAllSold() {
@@ -545,5 +609,35 @@ public class App {
            return setNumbersModels;
         } 
 
-   
+  
+    
+    private void incomeMonth() {
+       int sum = 0 ;
+        Calendar c = new GregorianCalendar();
+        System.out.println("*** Доход за месяц ***");
+        System.out.println("*** Введите месяц (1-12), за который надо вывести доход: ***");
+        Set<Integer> setNumbersMonths = new HashSet<>();
+        for(int i = 1;i<13;i++){
+            setNumbersMonths.add(i);
+        }
+        int month = insertNumber(setNumbersMonths)-1;
+        System.out.println("*** Введите год, за который надо вывести доход: ***");
+        
+        int year = getNumber();
+        
+        
+        for (int i = 0; i < histories.size(); i++) {
+            Date date = histories.get(i).getDateOfSale();
+           //Calendar cal = Calendar.getInstance();
+            c.setTime(date);
+            int saleMonth = c.get(Calendar.MONTH);
+            int saleYear = c.get(Calendar.YEAR);
+            if ( month == saleMonth && year == saleYear) {
+                sum += histories.get(i).getModel().getPrice();
+            }
+
+        }
+        System.out.println("Доход за "+ (month+1) +": "+sum);
+    }
+
 }
