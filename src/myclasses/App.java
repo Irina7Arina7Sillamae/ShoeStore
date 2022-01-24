@@ -4,8 +4,9 @@ package myclasses;
 import entity.Buyer;
 import entity.History;
 import entity.Model;
-import interfases.Keeping;
-import java.util.ArrayList;
+import facade.BuyerFacade;
+import facade.HistoryFacade;
+import facade.ModelFacade;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -16,18 +17,17 @@ import java.util.Date;
 
 public class App {
     private Scanner scanner = new Scanner(System.in);
-    //----- Данные магазина -----
-    private List<Model> models = new ArrayList<>();
-    private List<Buyer> buyers = new ArrayList<>();
-    private List<History> histories = new ArrayList<>();
-    //----- Сохранение -----
-    //private Keeping keeping = new KeeperToFile();
-    private Keeping keeping =  new KeeperToBase();
+    private BuyerFacade buyerFacade;
+    private ModelFacade modelFacade;
+    private HistoryFacade historyFacade;
     
     public App() {
-        models = keeping.loadModels();
-        buyers = keeping.loadBuyers();
-        histories = keeping.loadHistories();
+        init();   
+    }
+    private void init() {
+        buyerFacade = new BuyerFacade(Buyer.class);
+        modelFacade = new ModelFacade(Model.class);
+        historyFacade = new HistoryFacade(History.class);
     }
 
     public void run() {
@@ -75,7 +75,7 @@ public class App {
                     addHistory();
                     break;
                 case 6:
-                    printListSales();
+                    Sales();
                     break;               
                 case 7:
                     printListIncomeByDateOfSale();
@@ -87,7 +87,7 @@ public class App {
                     addMoney();
                     break;
                 case 10:
-                    editProduct();
+                    editModel();
                     break;
                 case 11:
                     editBuyer();
@@ -123,8 +123,7 @@ public class App {
         System.out.print("Введите количество полученной обуви: ");
         model.setQuantity(scanner.nextInt());scanner.nextLine();
         model.setCount(model.getQuantity());
-        models.add(model);
-        keeping.saveModels(models);
+        modelFacade.create(model);
     }
    
     
@@ -141,143 +140,160 @@ public class App {
         buyer.setPhone(scanner.nextLine()); 
         System.out.println("Деньги покупателя: ");
         buyer.setMoney(scanner.nextInt());scanner.nextLine();
-        buyers.add(buyer);
-        keeping.saveBuyers(buyers);   
-    }
+        buyerFacade.create(buyer);
 
-        private void addHistory() {
-            System.out.println("---------------");
-            System.out.println("*** Продажа обуви ***");
-            System.out.println("*** Выберите номер обуви для покупки: ***");
-            History history = new History();
-            Set<Integer> setNumbersModels = printListModels();
-            if(setNumbersModels.isEmpty()){
-                System.out.println("*** В списке нет обуви ***");
-                return;
-            }
-            int numberModel = insertNumber(setNumbersModels);
-            
-            Set<Integer> setNumbersBuyers = printListBuyersForSale();
-            if(setNumbersBuyers.isEmpty()){
-                System.out.println("*** В списке нет покупателей ***");
-                return;
-            }
-            System.out.print("*** Выберите номер покупателя: ***   ");
-            int numberBuyer = insertNumber(setNumbersBuyers);
-            
-            history.setModel(models.get(numberModel-1));
-            history.setBuyer(buyers.get(numberBuyer-1));
-            
-            Calendar c = new GregorianCalendar();
-            history.setDateOfSale(c.getTime());
+    private void addHistory(){
+        if (isQuit()) {
+            return;
+        }
+        System.out.println("---------------");
+        System.out.println("*** Продажа обуви ***");
+        System.out.println("*** Выберите номер обуви для покупки: ***");
+        
+        History history = new History();
+        Set<Integer> setNumbersModels = printListModels();
+        if(setNumbersModels.isEmpty()){
+            System.out.println("*** В списке нет обуви ***");
+            return;
+        }
+        int numberModel = insertNumber(setNumbersModels);
+        
+        Set<Integer> setNumbersBuyers = printListBuyersForSale();
+        if(setNumbersBuyers.isEmpty()){
+            System.out.println("*** В списке нет покупателей ***");
+            return;
+        }
+        System.out.print("*** Выберите номер покупателя: ***   ");
+        int numberBuyer = insertNumber(setNumbersBuyers);
+        
+        Model model = modelFacade.find((long)numberModel);
+        history.setModel(model);
+        
+        
+        Buyer buyer = buyerFacade.find((long)numberBuyer);
+        history.setBuyer(buyer);
+        
+        Calendar c = new GregorianCalendar();
+        history.setDateOfSale(c.getTime());
+    
+        
+        model.setCount(model.getCount() - 1);
+        buyer.setMoney(buyer.getMoney() - model.getPrice());
+        
+        modelFacade.edit(model);
+        historyFacade.create(history);
         
             
-            history.getModel().setCount(history.getModel().getCount() - 1);
-            history.getBuyer().setMoney(history.getBuyer().getMoney() - history.getModel().getPrice());
-            keeping.saveModels(models);
-            keeping.saveBuyers(buyers);
-            histories.add(history);
-            keeping.saveHistories(histories);
-            
-            System.out.println("-------------------");
-            System.out.println("*** ПРОДАНО:   " + history.getModel().getManufacturer()
-                + " цена: " + history.getModel().getPrice() + "eur"
-                + " / цвет: " + history.getModel().getColor()
-                + " / размер: " + history.getModel().getSize()
-                + " / покупатель: "+history.getBuyer().getName()
-                + " / тел: " + history.getBuyer().getPhone()
-            );
+        System.out.println("-------------------");
+        System.out.println("*** ПРОДАНО:   " + model.getManufacturer()
+            + " цена: " + model.getPrice() + "eur"
+            + " / цвет: " + model.getColor()
+            + " / размер: " + model.getSize()
+            + " / покупатель: "+ buyer.getName()
+            + " / тел: " + buyer.getPhone()
+        );
+    }
         
-            }
+    private Set<Integer> printListModels() {
+        System.out.println("---------------");
+        System.out.println("*** Список обуви в продаже ***");
         
-        private Set<Integer> printListModels() {
-            System.out.println("---------------");
-            System.out.println("*** Список обуви в продаже ***");
-            Set<Integer> setNumbersModels = new HashSet<>();
-                for (int i = 0; i < models.size(); i++) {
-                    if(models.get(i) != null && models.get(i).getCount() > 0){
-                        System.out.printf("%3d   %-15s %-10s size: %-5d %5d eur    Всего: %3d tk    В наличии: %3d tk %n"
-                        ,i+1
-                        ,models.get(i).getManufacturer()
-                        ,models.get(i).getColor()
-                        ,models.get(i).getSize()
-                        ,models.get(i).getPrice()
-                        ,models.get(i).getQuantity()
-                        ,models.get(i).getCount()
-                    );
-                         setNumbersModels.add(i+1);
-                    }
-                } 
-           return setNumbersModels;
-        } 
-        private Set<Integer> printListAllModels() {
-            System.out.println("---------------");
-            System.out.println("*** Список обуви ***");
-            Set<Integer> setNumbersModels = new HashSet<>();
+        Set<Integer> setNumbersModels = new HashSet<>();
+        List<Model> models = modelFacade.findAll();
             for (int i = 0; i < models.size(); i++) {
-                if(models.get(i) != null && models.get(i).getCount() >= 0){
-                    System.out.printf("%3d   %-12s %-10s size: %-4d %5d eur     Всего: %3d tk     В наличии: %3d tk %n"
-                        ,i+1
-                        ,models.get(i).getManufacturer()
-                        ,models.get(i).getColor()
-                        ,models.get(i).getSize()
-                        ,models.get(i).getPrice()
-                        ,models.get(i).getQuantity()
-                        ,models.get(i).getCount()
+                if(models.get(i) != null && models.get(i).getCount() > 0){
+                    System.out.printf("%3d   %-15s %-10s size: %-5d %5d eur    Всего: %3d tk    В наличии: %3d tk %n"
+                    ,models.get(i).getId()
+                    ,models.get(i).getManufacturer()
+                    ,models.get(i).getColor()
+                    ,models.get(i).getSize()
+                    ,models.get(i).getPrice()
+                    ,models.get(i).getQuantity()
+                    ,models.get(i).getCount()
                 );
-                setNumbersModels.add(i+1);
+                     setNumbersModels.add(models.get(i).getId().intValue());
+                }
+            } 
+       return setNumbersModels;
+    } 
+    private Set<Integer> printListAllModels() {
+        System.out.println("---------------");
+        System.out.println("*** Список обуви ***");
+            
+        Set<Integer> setNumbersModels = new HashSet<>();
+        List<Model> models = modelFacade.findAll();
+        for (int i = 0; i < models.size(); i++) {
+            if(models.get(i) != null && models.get(i).getCount() >= 0){
+                System.out.printf("%3d   %-12s %-10s size: %-4d %5d eur     Всего: %3d tk     В наличии: %3d tk %n"
+                    ,models.get(i).getId()
+                    ,models.get(i).getManufacturer()
+                    ,models.get(i).getColor()
+                    ,models.get(i).getSize()
+                    ,models.get(i).getPrice()
+                    ,models.get(i).getQuantity()
+                    ,models.get(i).getCount()
+                );
+                setNumbersModels.add(models.get(i).getId().intValue());
             }
         }
-        System.out.println("-------------------");
-        return setNumbersModels;
+    System.out.println("-------------------");
+    return setNumbersModels;
     }
         
-        private Set<Integer> printListBuyers() {
-            
-            System.out.println("---------------");
-            System.out.println("*** Список покупателей ***");
-            Set<Integer> setNumbersBuyers = new HashSet<>();
-                for (int i = 0; i < buyers.size(); i++) {
-                    if(buyers.get(i) != null){
-                         System.out.printf("%3d   %-22s  тел: %-12s %5d eur%n"
-                        ,i+1
-                        ,buyers.get(i).getName()
-                        ,buyers.get(i).getPhone()
-                        ,buyers.get(i).getMoney()
-                        );
-                        setNumbersBuyers.add(i+1);
-                    }
+    private Set<Integer> printListBuyers() {
+        
+        System.out.println("---------------");
+        System.out.println("*** Список покупателей ***");
+        
+        Set<Integer> setNumbersBuyers = new HashSet<>();
+        List<Buyer> buyers = buyerFacade.findAll();
+            for (int i = 0; i < buyers.size(); i++) {
+                if(buyers.get(i) != null){
+                     System.out.printf("%3d   %-22s  тел: %-12s %5d eur%n"
+                    ,buyers.get(i).getId()
+                    ,buyers.get(i).getName()
+                    ,buyers.get(i).getPhone()
+                    ,buyers.get(i).getMoney()
+                    );
+                    setNumbersBuyers.add(buyers.get(i).getId().intValue());
                 }
-                return setNumbersBuyers;
+            }
+            return setNumbersBuyers;
     } 
         
-         private Set<Integer> printListBuyersForSale() {
-             System.out.println("---------------");
-            System.out.println("*** Список покупателей ***");
-            Set<Integer> setNumbersBuyers = new HashSet<>();
-                for (int i = 0; i < buyers.size(); i++) {
-                    if(buyers.get(i) != null && buyers.get(i).getMoney() > (models.get(i).getPrice()-1)){
-                         System.out.printf("%3d   %-22s  тел: %-12s %5d eur%n"
-                        ,i+1
-                        ,buyers.get(i).getName()
-                        ,buyers.get(i).getPhone()
-                        ,buyers.get(i).getMoney()
-                        );
-                        setNumbersBuyers.add(i+1);
-                    }
+    private Set<Integer> printListBuyersForSale() {
+         System.out.println("---------------");
+        System.out.println("*** Список покупателей ***");
+        
+        Set<Integer> setNumbersBuyers = new HashSet<>();
+        List<Buyer> buyers = buyerFacade.findAll();
+        List<Model> models = modelFacade.findAll();
+            for (int i = 0; i < buyers.size(); i++) {
+                if(buyers.get(i) != null && buyers.get(i).getMoney() > (models.get(i).getPrice()-1)){
+                     System.out.printf("%3d   %-22s  тел: %-12s %5d eur%n"
+                    ,buyers.get(i).getId()
+                    ,buyers.get(i).getName()
+                    ,buyers.get(i).getPhone()
+                    ,buyers.get(i).getMoney()
+                    );
+                    setNumbersBuyers.add(buyers.get(i).getId().intValue());
                 }
-                return setNumbersBuyers;
+            }
+            return setNumbersBuyers;
     }
         
         
         
-        private Set<Integer> printListSales(){
-            System.out.println("-------------------");
+    private Set<Integer> Sales(){
+         System.out.println("-------------------");
             System.out.println("*** Список продаж ***");
             Set<Integer> setNumbersModels = new HashSet<>();
+            
+            List<History> histories = historyFacade.findAll();
+            
             for (int i = 0; i < histories.size(); i++) {
                 if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount() > 0) {                          
-                    System.out.println( i+1 + ". " 
+                    System.out.println( histories.get(i).getId() + ". " 
                         + "производитель: " + histories.get(i).getModel().getManufacturer()
                         + " / цвет: " +  histories.get(i).getModel().getColor()
                         + " / цена: " + histories.get(i).getModel().getPrice() + "eur "
@@ -285,7 +301,7 @@ public class App {
                         + " / покупатель: " + histories.get(i).getBuyer().getName()
                         + " / тел: " + histories.get(i).getBuyer().getPhone()
                     );
-                    setNumbersModels.add(i+1);
+                    setNumbersModels.add(histories.get(i).getId().intValue());
                 }
             } 
             if(setNumbersModels.isEmpty()){
@@ -295,73 +311,84 @@ public class App {
         return setNumbersModels;
 }
     
-        private void printListIncomeByDateOfSale() {
-            System.out.println("-------------------");
-            System.out.println("*** Список доходов по датам продаж ***");                      
+         
+    
+    private void printListIncomeByDateOfSale() {
+        System.out.println("-------------------");
+        System.out.println("*** Список доходов по датам продаж ***");
+        
+        List<History> histories = historyFacade.findAll();
+        int n = 0;
+        for (int i = 0; i < histories.size(); i++) {
+            if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount()> 0) {
+                System.out.println( "*** сумма: " + histories.get(i).getModel().getPrice() + "eur *** " 
+                        + histories.get(i).getDateOfSale()
+                );
+        n++;
+                }
+        } 
+        if (n < 1){
+        System.out.println("*** Товар пока не продавался! ***");   
+        }
+    }
+        
+    private void printListTotalIncome() {
+        System.out.println("-------------------");
+            System.out.println("*** Доход за время продаж ***");
+            
+            List<History> histories = historyFacade.findAll();
             int n = 0;
+            int sum = 0; 
             for (int i = 0; i < histories.size(); i++) {
                 if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount()> 0) {
-                    System.out.println( "*** сумма: " + histories.get(i).getModel().getPrice() + "eur *** " 
-                            + histories.get(i).getDateOfSale()
-                    );
-            n++;
-                    }
-            } 
-            if (n < 1){
-            System.out.println("*** Товар пока не продавался! ***");   
-            }
-        }
-        
-        private void printListTotalIncome() {
-            System.out.println("-------------------");
-                System.out.println("*** Доход за время продаж ***");
-                int n = 0;
-                int sum = 0; 
-                for (int i = 0; i < histories.size(); i++) {
-                    if(histories.get(i).getModel() != null && histories.get(i).getModel().getCount()> 0) {
-                        sum = sum + histories.get(i).getModel().getPrice(); 
-                    n++;
-                    } 
+                    sum = sum + histories.get(i).getModel().getPrice(); 
+                n++;
                 } 
-                System.out.println("*** общая сумма продаж:   " + sum + "   eur"); 
-                if (n < 1){
-                    System.out.println("*** Товар пока не продавался! ***");
-                }
-        }
-        
-        private void addMoney(){
-            System.out.println("---------------");
-            System.out.println("*** Добавить денег покупателю ***");
-            History history = new History(); 
-            System.out.println("*** Список покупателей ***");
-            int n = 0;
-                for (int i = 0; i < buyers.size(); i++) {
-                    if(buyers.get(i) != null){
-                        System.out.println((i+1) + ".   " + buyers.get(i).toString());
-                         n++;
+            } 
+            System.out.println("*** общая сумма продаж:   " + sum + "   eur"); 
+            if (n < 1){
+                System.out.println("*** Товар пока не продавался! ***");
             }
-        } 
-         if (n < 1){
+    }
+        
+    private void addMoney(){
+        System.out.println("---------------");
+        System.out.println("*** Добавить денег покупателю ***");
+        List<Buyer> buyers = buyerFacade.findAll();
+        
+        History history = new History(); 
+        System.out.println("*** Список покупателей ***");
+        int n = 0;
+            for (int i = 0; i < buyers.size(); i++) {
+                if(buyers.get(i) != null){
+                    System.out.println(buyers.get(i).getId() + ".   " + buyers.get(i).toString());
+                     n++;
+                }
+            } 
+        if (n < 1){
             System.out.println("*** Покупателей нет! ***");
             return;
-            }
-        
-           System.out.println("---------------");
-           System.out.print("*** Выберите номер покупателя:   ***   ");
-           int numBuyer = scanner.nextInt(); scanner.nextLine();
-           System.out.println("*** Укажите сумму, которую хотите добавить   ***");
-           int addMoney = scanner.nextInt();scanner.nextLine();
-           history.setBuyer(buyers.get(numBuyer-1));
-           history.getBuyer().setMoney(history.getBuyer().getMoney() + addMoney);
-           histories.add(history);
-           keeping.saveBuyers(buyers);
-           keeping.saveHistories(histories);
-           System.out.println("--------------------");
-           System.out.println( " *** " + buyers.get(numBuyer-1).getName()
-                        + " / Добавлены денеги в сумме: " + addMoney + " eur"
-                        + " / Всего у покупателя: " +  buyers.get(numBuyer-1).getMoney() + " eur"); 
-            //System.out.println("Вот!");
-            } 
+        }
+    
+        System.out.println("---------------");
+        System.out.print("*** Выберите номер покупателя:   ***   ");
+        int numBuyer = scanner.nextInt(); scanner.nextLine();
+        System.out.println("*** Укажите сумму, которую хотите добавить   ***");
+        int addMoney = scanner.nextInt();scanner.nextLine();
+       
+        Buyer buyer = buyerFacade.find((long)numBuyer);
+       
+        history.setBuyer(buyers.get(numBuyer-1));
+        buyer.setMoney(buyer.getMoney() + addMoney);
+       
+        buyerFacade.edit(buyer);
+        historyFacade.edit(history);
+       
+        System.out.println("--------------------");
+        System.out.println( " *** " + buyers.get(numBuyer-1).getName()
+                    + " / Добавлены денеги в сумме: " + addMoney + " eur"
+                    + " / Всего у покупателя: " +  buyers.get(numBuyer-1).getMoney() + " eur"); 
+    } 
 
     private int getNumber() {
         int number;
@@ -387,7 +414,7 @@ public class App {
         }while(true);
     }
 
-    private void editProduct() {
+    private void editModel() {
         System.out.println("---------------");
         System.out.println("*** Редактировать товар ***");
         if(isQuit()){
@@ -402,7 +429,9 @@ public class App {
         ***повторить для всех полей 
         *сохранить данные
         */
-         Set<Integer> changeNumbers = new HashSet<>();
+        Set<Integer> changeNumbers = new HashSet<>();
+        List<Model> models = modelFacade.findAll(); 
+        
         changeNumbers.add(1);
         changeNumbers.add(2);
         Set<Integer> setNumbersModels = printListAllModels();
@@ -412,6 +441,9 @@ public class App {
         }
         System.out.println("*** Введите номер обуви:");
         int numberModel = insertNumber(setNumbersModels);
+        
+        Model model = modelFacade.find((long)numberModel);
+        
         //первое поле
         System.out.println("Производитель: " + models.get(numberModel - 1).getManufacturer());
         System.out.println("*** Если нужно изменить, нажми 1, если пропустить, нажми 2");
@@ -466,7 +498,9 @@ public class App {
             models.get(numberModel - 1).setQuantity(newQuantity);
             models.get(numberModel - 1).setCount(newCount);
         } 
-     keeping.saveModels(models);   
+        
+        //keeping.saveModels(models); 
+        modelFacade.edit(model);
     }
 
     /*private void editBuyer() {
@@ -525,6 +559,9 @@ public class App {
     
     private void editBuyer() {
         System.out.println("*** Выберите покупателя, которого хотитие изменить: ***");
+        
+        List<Buyer> buyers = buyerFacade.findAll();
+        
         int n=0;
         for (int i = 0; i < buyers.size(); i++) {
             if (buyers.get(i)!=null) {
@@ -543,6 +580,9 @@ public class App {
         }
         System.out.print("*** Выберите номер покупателя: ***");
         int numberBuyer= getNumber();
+        
+        Buyer buyer = buyerFacade.find((long)numberBuyer);
+        
         String repeat="yes";
         do{
             System.out.println(" 0: Выход");
@@ -558,19 +598,19 @@ public class App {
                     System.out.print("Введите новое имя покупателя: ");
                     
                     buyers.get(numberBuyer - 1).setName(scanner.nextLine()); 
-                    keeping.saveBuyers(buyers);
+                    buyerFacade.edit(buyer);
                     break;
                 case 2:
                     System.out.print("Введите новый номер покупателя: ");
                     String newPhone=scanner.nextLine();
                     buyers.get(numberBuyer - 1).setPhone(newPhone);
-                    keeping.saveBuyers(buyers);
+                    buyerFacade.edit(buyer);
                     break;
                 case 3:
                     System.out.print("Введите другое количество денег: ");
                     int newMoney=scanner.nextInt();
                     buyers.get(numberBuyer - 1).setMoney(newMoney);
-                    keeping.saveBuyers(buyers);
+                    buyerFacade.edit(buyer);
                     break;
             }
          }while("yes".equals(repeat));
@@ -589,25 +629,31 @@ public class App {
         }
     }
 
-       private Set<Integer> printListAllSold() {
-            System.out.println("*** Список распроданной обуви ***");
-            Set<Integer> setNumbersModels = new HashSet<>();
-                for (int i = 0; i < models.size(); i++) {
-                    if(models.get(i) != null && models.get(i).getCount() == 0){
-                        System.out.printf("%3d   %-12s %-10s size: %-5d %5d eur    Всего: %3d tk    В наличии: %3d tk %n"
-                        ,i+1
-                        ,models.get(i).getManufacturer()
-                        ,models.get(i).getColor()
-                        ,models.get(i).getSize()
-                        ,models.get(i).getPrice()
-                        ,models.get(i).getQuantity()
-                        ,models.get(i).getCount()
-                    );
-                         setNumbersModels.add(i+1);
-                    }
-                } 
-           return setNumbersModels;
+    private Set<Integer> printListAllSold() {
+        System.out.println("*** Список распроданной обуви ***");
+        Set<Integer> setNumbersModels = new HashSet<>();
+            
+        List<Model> models = modelFacade.findAll();
+            
+        for (int i = 0; i < models.size(); i++) {
+            if(models.get(i) != null && models.get(i).getCount() == 0){
+                System.out.printf("%3d   %-12s %-10s size: %-4d %5d eur     Всего: %3d tk     В наличии: %3d tk %n"
+                ,models.get(i).getId()
+                ,models.get(i).getManufacturer()
+                ,models.get(i).getColor()
+                ,models.get(i).getSize()
+                ,models.get(i).getPrice()
+                ,models.get(i).getQuantity()
+                ,models.get(i).getCount()
+                );
+                setNumbersModels.add(models.get(i).getId().intValue());
+            }
         } 
+        return setNumbersModels;
+    } 
+       
+       
+       
 
   
     
@@ -616,7 +662,10 @@ public class App {
         Calendar c = new GregorianCalendar();
         System.out.println("*** Доход за месяц ***");
         System.out.println("*** Введите месяц (1-12), за который надо вывести доход: ***");
+        
         Set<Integer> setNumbersMonths = new HashSet<>();
+        List<History> histories = historyFacade.findAll();
+        
         for(int i = 1;i<13;i++){
             setNumbersMonths.add(i);
         }
@@ -639,5 +688,6 @@ public class App {
         }
         System.out.println("Доход за "+ (month+1) +": "+sum);
     }
+    
 
 }
