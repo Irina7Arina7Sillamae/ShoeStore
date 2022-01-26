@@ -2,24 +2,34 @@
 package facade;
 
 import entity.History;
+import entity.Model;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import tools.Singleton;
 
 
-public class HistoryFacade extends AbstractFasade<History>{
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("ShoeStorePU");
-    private EntityManager em = emf.createEntityManager();
-    private EntityTransaction tx = em.getTransaction();
+public class HistoryFacade extends AbstractFacade<History>{
+    private EntityManager em;
 
-    public HistoryFacade(Class<History> entityClass) {
+    public HistoryFacade(Class<History>entityClass) {
         super(entityClass);
+        Singleton singleton = Singleton.getInstance();
+        em = singleton.getEntityManager();
     }
 
     @Override
     protected EntityManager getEntityManager() {
        return em;
     }
+    
+     public History find(Model book) {
+        try {
+            return (History) em.createQuery("SELECT h FROM History h WHERE h.model = :model AND h.returnedDate = null")
+                    .setParameter("mode3l", book)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     
 }

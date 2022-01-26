@@ -14,14 +14,17 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Date;
+import tools.Singleton;
 
 public class App {
     private Scanner scanner = new Scanner(System.in);
     private BuyerFacade buyerFacade;
     private ModelFacade modelFacade;
     private HistoryFacade historyFacade;
+    private Singleton singleton;
     
     public App() {
+        singleton = Singleton.getInstance();
         init();   
     }
     private void init() {
@@ -141,7 +144,7 @@ public class App {
         System.out.println("Деньги покупателя: ");
         buyer.setMoney(scanner.nextInt());scanner.nextLine();
         buyerFacade.create(buyer);
-
+    }
     private void addHistory(){
         if (isQuit()) {
             return;
